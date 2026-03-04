@@ -1,6 +1,6 @@
 {
   "name": "@ideative/mongo-collections",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Mongo Collections - Strongly-typed MongoDB collections with optional document transformers (substituers), domain errors, and a small service layer. Built on the official mongodb driver.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
