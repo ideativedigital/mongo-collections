@@ -52,6 +52,3 @@ export function colDef<T extends Document>(
   return new ColDefinition<T>({ indexes: indexes ?? [], substituers: substituers ?? {} })
 }
 
-export function defineColDef({ substituers }: { substituers: Substituers }) {
-  return <T extends Document>(indexes: Indexes) => new ColDefinition<T>({ indexes, substituers })
-}
