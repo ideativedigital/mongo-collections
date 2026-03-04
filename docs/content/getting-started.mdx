@@ -1,0 +1,71 @@
+---
+title: Getting Started
+description: Install mongo-collections and create your first typed collection.
+category: Getting Started
+tags:
+  - install
+  - quickstart
+  - typed
+difficulty: beginner
+updatedAt: 2026-02-03
+---
+
+## Problem
+
+You want to connect to MongoDB and start using a typed collection immediately.
+
+## Recipe
+
+```bash
+pnpm add @ideative/mongo-collections mongodb
+```
+
+```ts
+import {
+  MongoService,
+  colDef,
+  mongoDatabase,
+  type Document,
+} from "@ideative/mongo-collections";
+
+type User = { id: string; name: string; email: string };
+type Order = { id: string; userId: string; total: number };
+
+const service = MongoService.create(process.env.MONGO_URI!);
+
+const Collections = mongoDatabase(service, {
+  users: colDef<User>({
+    indexes: [{ spec: { email: 1 }, options: { unique: true } }],
+  }),
+  orders: colDef<Order>({
+    indexes: [{ spec: { userId: 1 } }],
+  }),
+});
+
+await Collections.ensureIndexes();
+await Collections.users.insert({
+  id: "u1",
+  name: "Ada",
+  email: "ada@example.com",
+});
+await Collections.orders.insert({ id: "o1", userId: "u1", total: 149 });
+
+const user = await Collections.users.getById("u1");
+const userOrders = await Collections.orders.find({ userId: "u1" });
+```
+
+<ApiSignature
+  signature="mongoDatabase(service, defs)"
+  returns="MongoResult<typeof defs>"
+/>
+
+## Why this works
+
+- `MongoService` centralizes the DB connection.
+- `colDef` gives your collection index configuration and type holder.
+- `mongoDatabase` exposes typed collections plus helpers (`ensureIndexes`, `withTransaction`, `gridfs`).
+
+<Callout status="info">
+  `getById` throws `NotFoundError` if no document exists; use `findById` for
+  nullable reads.
+</Callout>

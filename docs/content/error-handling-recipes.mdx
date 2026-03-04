@@ -1,0 +1,52 @@
+---
+title: Error Handling Recipes
+description: Handle domain errors consistently across services and HTTP handlers.
+category: Error Handling
+tags:
+  - errors
+  - notfound
+  - duplicate
+difficulty: beginner
+updatedAt: 2026-02-03
+---
+
+## Domain error classes
+
+```ts
+import {
+  NotFoundError,
+  BadParametersError,
+  DuplicateError,
+} from "@ideative/mongo-collections"
+```
+
+## Service-level handling
+
+```ts
+try {
+  const user = await Collections.users.getById("missing")
+  return user
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    return null
+  }
+  throw error
+}
+```
+
+## HTTP mapping with MongoResource
+
+```ts
+const handlers = MongoResource(usersCollection, {
+  errorHandler: (error) => {
+    if (error instanceof NotFoundError) {
+      return Response.json({ error: error.message }, { status: 404 })
+    }
+    return Response.json({ error: "Unexpected error" }, { status: 500 })
+  },
+})
+```
+
+<Callout status="warning">
+Keep one central error-handling policy for your app. Avoid scattered ad-hoc mappings in route handlers.
+</Callout>

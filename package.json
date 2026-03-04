@@ -1,0 +1,89 @@
+{
+  "name": "@ideative/mongo-collections",
+  "version": "0.0.1",
+  "description": "Mongo Collections - Strongly-typed MongoDB collections with optional document transformers (substituers), domain errors, and a small service layer. Built on the official mongodb driver.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js",
+      "default": "./dist/errors.js"
+    },
+    "./resource": {
+      "types": "./dist/resource.d.ts",
+      "import": "./dist/resource.js",
+      "default": "./dist/resource.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "ava --node-arguments='--import=tsx'",
+    "prepublishOnly": "pnpm run build",
+    "docs:start": "pnpm --dir docs dev",
+    "docs:dev": "pnpm --dir docs dev",
+    "docs:build": "pnpm --dir docs build",
+    "docs:preview": "pnpm --dir docs preview"
+  },
+  "ava": {
+    "files": [
+      "__tests__/**/*.test.ts"
+    ],
+    "extensions": [
+      "ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acominotto/mongo-collections"
+  },
+  "author": {
+    "name": "Adrien Cominotto",
+    "email": "adrien.cominotto@gmail.com",
+    "url": "https://github.com/acominotto"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "next": ">=15.0.0",
+    "zod": ">=4.3.6"
+  },
+  "dependencies": {
+    "mongodb": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=22.10.1",
+    "pnpm": ">=10.26.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "ava": "^6.0.0",
+    "ky": "^1.7.2",
+    "mongodb-memory-server": "^10.0.0",
+    "next": ">=15.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "zod": ">=4.3.6"
+  },
+  "keywords": [
+    "next",
+    "nextjs",
+    "api",
+    "api-routes",
+    "endpoint",
+    "zod",
+    "payload",
+    "api-handler",
+    "errors",
+    "error",
+    "error-handling",
+    "error-serialization"
+  ]
+}

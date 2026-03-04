@@ -1,0 +1,52 @@
+---
+title: Substituer Recipes
+description: Deep transform patterns with substitute and substituteBuilder.
+category: Substituers
+tags:
+  - transform
+  - substitute
+  - builder
+difficulty: intermediate
+updatedAt: 2026-02-03
+---
+
+## Single-rule substituer
+
+```ts
+import { substitute } from "@ideative/mongo-collections"
+import { ObjectId } from "mongodb"
+
+const objectIdOut = substitute(
+  (value): value is ObjectId => value instanceof ObjectId,
+  (id) => id.toHexString()
+)
+```
+
+## Complex substituer with builder
+
+```ts
+import { substituteBuilder } from "@ideative/mongo-collections"
+import { ObjectId } from "mongodb"
+
+const out = substituteBuilder()
+  .when((x): x is Date => x instanceof Date, (d) => d.toISOString())
+  .when((x): x is ObjectId => x instanceof ObjectId, (id) => id.toHexString())
+  .build()
+```
+
+## Attach to collection
+
+```ts
+const Collections = mongoDatabase(service, {
+  users: colDef<User>({
+    substituers: {
+      in: objectIdIn,
+      out,
+    },
+  }),
+})
+```
+
+<Callout status="warning">
+Prefer model mappers when API and DB models differ significantly. Use substituers for targeted value-level transforms.
+</Callout>

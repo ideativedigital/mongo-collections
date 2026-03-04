@@ -1,0 +1,6 @@
+.docs-code-block pre::selection,
+.docs-code-block code::selection,
+.docs-code-block span::selection {
+  background: #334155;
+  color: #f8fafc;
+}

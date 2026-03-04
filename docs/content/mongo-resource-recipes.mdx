@@ -1,0 +1,64 @@
+---
+title: MongoResource Recipes
+description: Build Next.js App Router handlers quickly with MongoResource.
+category: MongoResource
+tags:
+  - nextjs
+  - rest
+  - handlers
+difficulty: intermediate
+updatedAt: 2026-02-03
+---
+
+## Basic route handlers
+
+```ts
+// app/api/users/[...resource]/route.ts
+import { MongoResource } from "@ideative/mongo-collections/resource"
+
+const usersCollection = Collections.users
+
+export const { GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS } =
+  MongoResource(usersCollection)
+```
+
+## Validate every request
+
+```ts
+import { BadParametersError } from "@ideative/mongo-collections"
+
+const handlers = MongoResource(usersCollection, {
+  validateRequest: async (request, resource, method) => {
+    const auth = request.headers.get("authorization")
+    if (!auth) {
+      throw new BadParametersError(`Missing auth for ${method}`, usersCollection.name)
+    }
+  },
+})
+```
+
+## Custom payload and update behavior
+
+```ts
+const handlers = MongoResource(usersCollection, {
+  parsePayload: (payload) => ({ name: String(payload.name).trim() }),
+  payloadToUpdate: (payload) => ({ $set: { name: payload.name }, $inc: { version: 1 } }),
+})
+```
+
+## Bulk POST
+
+```ts
+await fetch("/api/users/bulk", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify([
+    { id: "u1", name: "A" },
+    { id: "u2", name: "B" },
+  ]),
+})
+```
+
+<Callout status="info">
+`POST /bulk` expects an array body and returns `400` when payload is not an array.
+</Callout>

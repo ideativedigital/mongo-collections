@@ -1,0 +1,43 @@
+---
+title: GridFS Recipes
+description: Store and retrieve files with the GridFS bucket proxy.
+category: GridFS
+tags:
+  - file-storage
+  - stream
+  - bucket
+difficulty: intermediate
+updatedAt: 2026-02-03
+---
+
+## Get proxy from mongoDatabase
+
+```ts
+const Collections = mongoDatabase(service, {
+  users: colDef<User>(),
+  orders: colDef<Order>(),
+})
+
+const upload = await Collections.gridfs.openUploadStream("avatar.png")
+```
+
+## Upload and download
+
+```ts
+const uploadStream = await Collections.gridfs.openUploadStream("file.txt")
+sourceReadable.pipe(uploadStream)
+
+const downloadStream = await Collections.gridfs.openDownloadStream(fileId)
+downloadStream.pipe(destinationWritable)
+```
+
+## Query and delete files
+
+```ts
+const files = await Collections.gridfs.find({ filename: "file.txt" })
+await Collections.gridfs.delete(fileId)
+```
+
+<Callout status="info">
+The proxy methods are async wrappers around `GridFSBucket` operations, so they compose well in promise-based workflows.
+</Callout>

@@ -1,0 +1,75 @@
+---
+title: API Model ↔ DB Model Recipes
+description: Keep API shape and DB shape separate with explicit model mappers.
+category: Model Mapping
+tags:
+  - mapper
+  - api-model
+  - db-model
+difficulty: intermediate
+updatedAt: 2026-02-03
+---
+
+## Problem
+
+Your API model uses field names different from MongoDB documents.
+
+## Recipe
+
+```ts
+import {
+  modelMapper,
+  colDef,
+  mongoDatabase,
+  type Document,
+} from "@ideative/mongo-collections";
+
+type ApiUser = { id: string; name: string };
+type DbUser = { _id: string; db_name: string };
+
+const Collections = mongoDatabase(service, {
+  users: colDef<ApiUser>({
+    substituers: {
+      mapper: modelMapper<ApiUser, DbUser>({
+        toDb: (api) => ({ _id: api.id, db_name: api.name }),
+        toApi: (db) => ({ id: db._id, name: db.db_name }),
+        filterToDb: (filter) => {
+          const transformed = { ...(filter as any) };
+          if ("name" in transformed) {
+            transformed.db_name = transformed.name;
+            delete transformed.name;
+          }
+          return transformed;
+        },
+        updateToDb: (update) => {
+          const transformed = { ...(update as any) };
+          if (transformed.$set?.name) {
+            transformed.$set = {
+              ...transformed.$set,
+              db_name: transformed.$set.name,
+            };
+            delete transformed.$set.name;
+          }
+          return transformed;
+        },
+      }),
+    },
+  }),
+});
+```
+
+<ApiSignature
+  signature="modelMapper<ApiModel, DbModel>(mapper)"
+  returns="ModelMapper<ApiModel, DbModel>"
+/>
+
+## Why this works
+
+- `toDb` controls writes.
+- `toApi` controls reads.
+- `filterToDb` and `updateToDb` align query/update operators with DB field names.
+
+<Callout status="info">
+  You can still use legacy `substituers`; mapper is the explicit path for
+  divergent API/DB models.
+</Callout>

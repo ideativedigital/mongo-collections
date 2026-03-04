@@ -1,0 +1,51 @@
+---
+title: Collection Recipes
+description: Common CRUD and query patterns with typed collections.
+category: Collection
+tags:
+  - crud
+  - filters
+  - updates
+difficulty: beginner
+updatedAt: 2026-02-03
+---
+
+## Insert and read
+
+```ts
+await Collections.users.insert({ id: "u1", name: "Alice", email: "alice@example.com" })
+await Collections.orders.insert({ id: "o1", userId: "u1", total: 80 })
+
+const one = await Collections.users.findById("u1")   // User | null
+const sure = await Collections.users.getById("u1")   // User, throws if missing
+```
+
+## Query by filter
+
+```ts
+const highValueOrders = await Collections.orders.find({ total: { $gte: 100 } })
+const userCount = await Collections.users.count({})
+const exists = await Collections.users.exists({ email: "alice@example.com" })
+```
+
+## Update patterns
+
+```ts
+await Collections.users.updateOne(
+  { id: "u1" },
+  { $set: { name: "Alice Updated" } }
+)
+
+await Collections.orders.updatebyId("o1", { $set: { total: 95 } })
+```
+
+## Delete patterns
+
+```ts
+await Collections.orders.deleteById("o1")
+await Collections.users.deleteById("u1")
+```
+
+<Callout status="warning">
+Use `deleteMany` only with explicit filters. Add guard checks in your app-level service when needed.
+</Callout>
